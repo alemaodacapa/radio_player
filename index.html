@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reggaeroots Radio Player</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "gsap": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="player-container">
+    <div class="album-art">
+      <img id="albumImage" src="https://i.scdn.co/image/ab67616d00001e02ccdb0c63b7c823cf38974b5d" alt="Capa do Álbum - Reggaeroots">
+    </div>
+
+    <div class="player-controls">
+      <div class="track-info">
+        <h2 id="songTitle">Rádio Player Online</h2>
+        <a href="https://open.spotify.com/intl-pt/artist/1WilWzr4bR77Z317TJ4tE7?si=Qjge4kRfSkK9Q-WuUhmNtQ" target="_blank" id="artistName">Reggaeroots</a>
+      </div>
+
+      <div class="player-status-lights">
+        <div id="playLight" class="light play-light"></div>
+        <div id="stopLight" class="light stop-light"></div>
+      </div>
+
+      <div class="controls">
+        <button id="prevBtn" title="Anterior">⏮️</button>
+        <button id="playPauseBtn" title="Play/Pause">▶️</button>
+        <button id="stopBtn" title="Parar">⏹️</button>
+        <button id="nextBtn" title="Próxima">⏭️</button>
+      </div>
+
+      <div class="volume-controls">
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+        <button id="muteBtn" title="Mudo/Ativar Som">🔊</button>
+      </div>
+
+      <div class="playlist-container">
+        <ul id="playlistEl"></ul>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audioPlayer"></audio>
+
+<script type="module">
+  const playlist = [
+    { src: 'https://reggaeroots.com.br/audio/sound_Funk_do_Terror.mp3', title: 'Funk do Terror', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Funk_do_Terror_Remix.mp3', title: 'Funk do Terror Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Bararabembembem.mp3', title: 'Bararabembembem', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Bararabembembem_Remix.mp3', title: 'Bararabembembem Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Lembranças_Remix.mp3', title: 'Lembranças Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Luz_do_Neon.mp3', title: 'Luz do Neon', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Não_pare_dance.mp3', title: 'Não Pare Dance', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Promessas_Prometo.mp3', title: 'Promessas Prometo', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Promisses.mp3', title: 'Promisses', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Promisses_mix.mp3', title: 'Promisses Mix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Saudade_Remix[2].mp3', title: 'Saudade Remix 2', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Saudade_Remix[3].mp3', title: 'Saudade Remix 3', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Saudades.mp3', title: 'Saudades', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Saudades_Remix.mp3', title: 'Saudades Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Estralador.mp3', title: 'Estralador', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Estralador_(V1).mp3', title: 'Estralador V1', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Esqueci.mp3', title: 'Esqueci', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Esqueci_Remix.mp3', title: 'Esqueci Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Me-ensina_a_surfar.mp3', title: 'Me Ensina a Surfar', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Partindo.mp3', title: 'Partindo', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Partindo_Remix.mp3', title: 'Partindo Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Praia_do_Leblon.mp3', title: 'Praia do Leblon', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Primeiro_amor.mp3', title: 'Primeiro Amor', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Primeiro_Amor_Remix.mp3', title: 'Primeiro Amor Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Rainha_do_mar.mp3', title: 'Rainha do Mar', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Selva_da_cidade.mp3', title: 'Selva da Cidade', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Selva_guarda.mp3', title: 'Selva Guarda', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Sentimento_ruim.mp3', title: 'Sentimento Ruim', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Sentimento_ruim_Remix.mp3', title: 'Sentimento Ruim Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Promessas.mp3', title: 'Promessas', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Promessas_remix.mp3', title: 'Promessas Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Jessica.mp3', title: 'Jessica', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Raquel.mp3', title: 'Raquel', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Só_contigo_quero_viver.mp3', title: 'Só Contigo Quero Viver', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Tudo_o_que_ela_quer.mp3', title: 'Tudo o Que Ela Quer', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Volta_Isabele.mp3', title: 'Volta Isabele', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Faço_meu_Corre.mp3', title: 'Faço Meu Corre', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Goiaba.mp3', title: 'Goiaba', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Humanos_vs_Humanos_Remix.mp3', title: 'Humanos vs Humanos Remix', artist: 'Reggaeroots' },
+    { src: 'https://reggaeroots.com.br/audio/sound_Faço_meu_Corre_versão_2.mp3', title: 'Faço Meu Corre Versão 2', artist: 'Reggaeroots' }
+  ];
+
+  const audioPlayer = document.getElementById('audioPlayer');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const muteBtn = document.getElementById('muteBtn');
+  const playLight = document.getElementById('playLight');
+  const stopLight = document.getElementById('stopLight');
+  const songTitleEl = document.getElementById('songTitle');
+  const artistNameEl = document.getElementById('artistName');
+  const playlistEl = document.getElementById('playlistEl');
+  
+  let currentSongIndex = 0;
+
+  // Carregar lista de músicas na interface
+  playlist.forEach((song, index) => {
+    const li = document.createElement('li');
+    li.textContent = `${song.title} - ${song.artist}`;
+    li.addEventListener('click', () => {
+      currentSongIndex = index;
+      playSong();
+    });
+    playlistEl.appendChild(li);
+  });
+
+  // Função para tocar a música
+  function playSong() {
+    const song = playlist[currentSongIndex];
+    audioPlayer.src = song.src;
+    songTitleEl.textContent = song.title;
+    artistNameEl.textContent = song.artist;
+
+    audioPlayer.play();
+    playLight.style.display = 'block';
+    stopLight.style.display = 'none';
+  }
+
+  // Função para pausar a música
+  function pauseSong() {
+    audioPlayer.pause();
+    playLight.style.display = 'none';
+    stopLight.style.display = 'block';
+  }
+
+  // Função para parar a música
+  function stopSong() {
+    audioPlayer.pause();
+    audioPlayer.currentTime = 0;
+    playLight.style.display = 'none';
+    stopLight.style.display = 'block';
+  }
+
+  // Função para controlar o volume
+  volumeSlider.addEventListener('input', () => {
+    audioPlayer.volume = volumeSlider.value;
+  });
+
+  // Função para ativar/desativar som
+  muteBtn.addEventListener('click', () => {
+    if (audioPlayer.muted) {
+      audioPlayer.muted = false;
+      muteBtn.textContent = '🔊';
+    } else {
+      audioPlayer.muted = true;
+      muteBtn.textContent = '🔇';
+    }
+  });
+
+  // Função para reproduzir a próxima música
+  nextBtn.addEventListener('click', () => {
+    currentSongIndex = (currentSongIndex + 1) % playlist.length;
+    playSong();
+  });
+
+  // Função para reproduzir a música anterior
+  prevBtn.addEventListener('click', () => {
+    currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+    playSong();
+  });
+
+  // Função para tocar ou pausar
+  playPauseBtn.addEventListener('click', () => {
+    if (audioPlayer.paused) {
+      playSong();
+    } else {
+      pauseSong();
+    }
+  });
+
+  // Inicializar player com a primeira música
+  playSong();
+</script>
+
+</body>
+</html>
